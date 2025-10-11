@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pesanan;
+use App\Models\Produksi;
+use App\Models\ProduksiStatus;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class PesananAdminController extends Controller
 {
@@ -123,19 +126,39 @@ class PesananAdminController extends Controller
     // APPROVE / REJECT tetap
     public function setujui(Pesanan $pesanan)
     {
-        if ($pesanan->status !== 'menunggu') return back()->with('peringatan','Pesanan sudah diproses.');
+        if ($pesanan->status !== 'menunggu') return back()->with('peringatan','Sudah diproses.');
 
-        DB::transaction(function() use ($pesanan) {
+        DB::transaction(function () use ($pesanan) {
+            // Pastikan pesanan punya resi
+            if (blank($pesanan->nomor_resi)) {
+                $pesanan->nomor_resi = $this->buatNomorResi();
+            }
+
             $pesanan->update([
-                'status' => 'disetujui',
-                'disetujui_oleh' => auth()->id(),
+                'status'            => 'disetujui',
+                'disetujui_oleh'    => Auth::id(), 
                 'tanggal_disetujui' => now(),
-                'nomor_resi' => $this->buatNomorResi(),
+                'nomor_resi'        => $pesanan->nomor_resi,
+            ]);
+
+            // Buat produksi hanya jika belum ada
+            Produksi::firstOrCreate(
+                ['pesanan_id' => $pesanan->id],
+                [
+                    'nomor_resi' => $pesanan->nomor_resi,          
+                    'status_key' => ProduksiStatus::orderBy('urutan')->value('key') ?? 'desain',
+                    'mulai_at'   => now(),
+                ]
+            )->logs()->create([
+                'status_key' => ProduksiStatus::orderBy('urutan')->value('key') ?? 'desain',
+                'catatan'    => 'Produksi dibuat dari persetujuan pesanan',
+                'created_by' => Auth::id(),
             ]);
         });
 
-        return back()->with('berhasil','Disetujui & nomor resi dibuat.');
+        return back()->with('berhasil','Disetujui & produksi dibuat.');
     }
+
 
     public function tolak(Request $request, Pesanan $pesanan)
     {
@@ -145,7 +168,7 @@ class PesananAdminController extends Controller
 
         $pesanan->update([
             'status' => 'ditolak',
-            'disetujui_oleh' => auth()->id(),
+            'disetujui_oleh' => Auth::id(), 
             'alasan_ditolak' => $request->alasan,
         ]);
 
@@ -155,7 +178,7 @@ class PesananAdminController extends Controller
     protected function buatNomorResi(): string
     {
         do {
-            $resi = 'RESI-' . now()->format('ymd') . '-' . strtoupper(Str::random(5));
+            $resi = 'TSBLN-' . now()->format('ymd') . '-' . strtoupper(Str::random(4));
         } while (Pesanan::where('nomor_resi',$resi)->exists());
         return $resi;
     }

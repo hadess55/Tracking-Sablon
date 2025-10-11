@@ -49,7 +49,7 @@
           placeholder="mis. Antri / Desain / Cetak / …"
           :options="$statusLabels"
         />
-        @error('status_sekarang')<p class="text-rose-600 text-xs mt-1">{{ $message }}</p>@enderror
+        @error('status_sekarang')<p class="text-rose-600 text-xs mt-1 ">{{ $message }}</p>@enderror
       </div>
     </div>
   </div>

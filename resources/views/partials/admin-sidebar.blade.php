@@ -47,7 +47,7 @@
         Dashboard
       </span>
     </a>
-    <a href="{{ url('#') }}" aria-label="Produksi"
+    <a href="{{ route('admin.produksi.index') }}" aria-label="Produksi"
         class="group relative flex items-center rounded-xl transition
         {{ request()->routeIs('admin.produksi.*') ? $activeCls : $idleCls }}"
         :class="openSidebar ? 'gap-3 px-3 py-2.5 justify-start' : 'gap-0 px-2 py-2.5 justify-center'">
@@ -86,17 +86,6 @@
       </span>
     </a>
 
-    <a href="{{ url('#') }}" aria-label="Tambah Produksi"
-       class="group relative flex items-center rounded-xl transition
-              {{ request()->routeIs('admin.produksi.create') ? $activeCls : $idleCls }}"
-       :class="openSidebar ? 'gap-3 px-3 py-2.5 justify-start' : 'gap-0 px-2 py-2.5 justify-center'">
-      <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-      <span class="truncate" x-show="openSidebar" x-transition>Tambah Produksi</span>
-      <span x-show="!openSidebar"
-            class="absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap rounded-lg bg-gray-800 text-white text-xs px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none transition">
-        Tambah Produksi
-      </span>
-    </a>
   </nav>
 
 

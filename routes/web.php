@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PesananController;
 use App\Http\Controllers\Admin\PesananAdminController;
 use App\Http\Controllers\Admin\CustomerAdminController;
+use App\Http\Controllers\Admin\ProduksiAdminController;
+use App\Http\Controllers\Admin\ProduksiStatusController;
+use App\Http\Controllers\TrackingController;
 
 Route::get('/', function () {
     return view('public.home');
@@ -13,6 +16,9 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return view('admin.dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/tracking/{resi}', [TrackingController::class,'show'])->name('tracking.show');
+
 
 Route::middleware('auth')->group(function () {
     // Customer
@@ -26,11 +32,18 @@ Route::middleware('auth')->group(function () {
 
     // Admin
     Route::middleware(['auth','admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/produksi', [ProduksiAdminController::class,'index'])->name('produksi.index');
+        Route::get('/produksi/{produksi}', [ProduksiAdminController::class,'show'])->name('produksi.show');
+        Route::put('/produksi/{produksi}', [ProduksiAdminController::class,'update'])->name('produksi.update');
+        Route::get('/produksi/quick', [ProduksiAdminController::class,'quick'])->name('produksi.quick');
+        Route::resource('produksi-status', ProduksiStatusController::class)->except(['show']);
+        
         Route::resource('pesanan', PesananAdminController::class)->parameters([
             'pesanan' => 'pesanan'
         ]);
         Route::post('/pesanan/{pesanan}/setujui', [PesananAdminController::class, 'setujui'])->name('pesanan.setujui');
         Route::post('/pesanan/{pesanan}/tolak', [PesananAdminController::class, 'tolak'])->name('pesanan.tolak');
+
         Route::resource('customer', CustomerAdminController::class)->parameters([
             'customer' => 'user'
         ])->except(['show']);
