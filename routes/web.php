@@ -12,7 +12,7 @@ use App\Http\Controllers\Admin\NotifController;
 
 Route::get('/', function () {
     return view('public.home');
-});
+}); 
 
 // routes/web.php
 Route::middleware(['auth','admin'])->get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])
@@ -27,7 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/pesanan', [PesananController::class, 'index'])->name('pesanan.index');
     Route::get('/pesanan/buat', [PesananController::class, 'buat'])->name('pesanan.buat');
     Route::post('/pesanan', [PesananController::class, 'simpan'])->name('pesanan.simpan');
-    Route::get('/pesanan/{pesanan}', [PesananController::class, 'tampil'])->name('pesanan.tampil');
+    Route::get('/pesanan/{pesanan}', [PesananController::class,'tampil'])->name('pesanan.tampil');  
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -35,7 +35,6 @@ Route::middleware('auth')->group(function () {
     // Admin
     Route::middleware(['auth','admin'])->prefix('admin')->name('admin.')->group(function () {
         
-
         Route::get('/produksi', [ProduksiAdminController::class,'index'])->name('produksi.index');
         Route::get('/produksi/{produksi}', [ProduksiAdminController::class,'show'])->name('produksi.show');
         Route::put('/produksi/{produksi}', [ProduksiAdminController::class,'update'])->name('produksi.update');

@@ -34,4 +34,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
     }
+    protected $policies = [
+        \App\Models\Pesanan::class => \App\Policies\PesananPolicy::class,
+    ];
+
 }
