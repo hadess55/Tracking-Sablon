@@ -21,11 +21,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        View::composer(['layouts.admin', 'partials.admin-sidebar'], function ($view) {
-            $sedangProses = Produksi::sedang()->count();
-            $selesai      = Produksi::selesai()->count();
+        // View::composer(['layouts.admin', 'partials.admin-sidebar'], function ($view) {
+        //     $sedangProses = Produksi::sedang()->count();
+        //     $selesai      = Produksi::selesai()->count();
 
-            $view->with(compact('sedangProses', 'selesai'));
-        });
+        //     $view->with(compact('sedangProses', 'selesai'));
+        // });
     }
 }

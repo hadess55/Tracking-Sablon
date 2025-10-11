@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role','no_hp', 'jalan','rt','rw','kelurahan','kecamatan','kota_kab','provinsi','kode_pos',
     ];
 
     /**
@@ -45,4 +46,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function pesanan() {
+        return $this->hasMany(Pesanan::class, 'pengguna_id');
+    }
+
 }

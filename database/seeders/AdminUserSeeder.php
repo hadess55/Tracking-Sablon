@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminUserSeeder extends Seeder {
     public function run(): void {
-        User::firstOrCreate(
+         User::firstOrCreate(
             ['email' => 'admin@gmail.com'],
-            ['name' => 'Admin Sablon', 'password' => Hash::make('admin123'), 'is_admin' => true]
+            ['name' => 'Admin', 'password' => Hash::make('admin123'), 'role' => 'admin']
         );
     }
 }

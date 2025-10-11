@@ -21,11 +21,11 @@
   <div class="grid grid-cols-2 gap-3 px-4 pt-3 "x-show="openSidebar" x-transition>
   <div class="rounded-xl border bg-white/70 backdrop-blur p-3">
     <div class="text-xs text-slate-500">Sedang Proses</div>
-    <div class="mt-1 text-md font-semibold leading-none">{{ $sedangProses ?? 0 }}</div>
+    {{-- <div class="mt-1 text-md font-semibold leading-none">{{ $sedangProses ?? 0 }}</div> --}}
   </div>
   <div class="rounded-xl border bg-white/70 backdrop-blur p-3">
     <div class="text-xs text-slate-500">Selesai</div>
-    <div class="mt-1 text-md font-semibold leading-none">{{ $selesai ?? 0 }}</div>
+    {{-- <div class="mt-1 text-md font-semibold leading-none">{{ $selesai ?? 0 }}</div> --}}
   </div>
 </div>
 
@@ -36,35 +36,57 @@
       $idleCls   = 'text-slate-700 hover:bg-white/60';
     @endphp
 
-    <a href="{{ route('admin.produksi.index') }}" aria-label="Produksi"
+    <a href="{{ url('dashboard') }}" aria-label="Dashboard"
        class="group relative flex items-center rounded-xl transition
               {{ request()->routeIs('admin.produksi.*') ? $activeCls : $idleCls }}"
        :class="openSidebar ? 'gap-3 px-3 py-2.5 justify-start' : 'gap-0 px-2 py-2.5 justify-center'">
       <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="2" d="M3 6h18M3 12h18M3 18h18"/></svg>
-      <span class="truncate" x-show="openSidebar" x-transition>Produksi</span>
+      <span class="truncate" x-show="openSidebar" x-transition>Dashboard</span>
       <span x-show="!openSidebar"
             class="absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap rounded-lg bg-gray-800 text-white text-xs px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none transition">
+        Dashboard
+      </span>
+    </a>
+    <a href="{{ url('#') }}" aria-label="Produksi"
+        class="group relative flex items-center rounded-xl transition
+        {{ request()->routeIs('admin.produksi.*') ? $activeCls : $idleCls }}"
+        :class="openSidebar ? 'gap-3 px-3 py-2.5 justify-start' : 'gap-0 px-2 py-2.5 justify-center'">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="2" d="M3 6h18M3 12h18M3 18h18"/></svg>
+        <span class="truncate" x-show="openSidebar" x-transition>Produksi</span>
+        <span x-show="!openSidebar"
+        class="absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap rounded-lg bg-gray-800 text-white text-xs px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none transition">
         Produksi
       </span>
     </a>
 
+<a href="{{ route('pesanan.index') }}" aria-label="Pesanan"
+   class="group relative flex items-center rounded-xl transition
+          {{ request()->routeIs('admin.produksi.*') ? $activeCls : $idleCls }}"
+   :class="openSidebar ? 'gap-3 px-3 py-2.5 justify-start' : 'gap-0 px-2 py-2.5 justify-center'">
+  <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="2" d="M3 6h18M3 12h18M3 18h18"/></svg>
+  <span class="truncate" x-show="openSidebar" x-transition>Pesanan</span>
+  <span x-show="!openSidebar"
+        class="absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap rounded-lg bg-gray-800 text-white text-xs px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none transition">
+    Pesanan
+  </span>
+</a>
 
-    <a href="{{ route('admin.customers.index') }}" aria-label="Pelanggan"
-       class="group relative flex items-center rounded-xl transition
-              {{ request()->routeIs('admin.customers.*') ? $activeCls : $idleCls }}"
-       :class="openSidebar ? 'gap-3 px-3 py-2.5 justify-start' : 'gap-0 px-2 py-2.5 justify-center'">
+      <a href="{{ route('admin.customer.index') }}" aria-label="Customer"
+      class="group relative flex items-center rounded-xl transition
+      {{ request()->routeIs('admin.customers.*') ? $activeCls : $idleCls }}"
+      :class="openSidebar ? 'gap-3 px-3 py-2.5 justify-start' : 'gap-0 px-2 py-2.5 justify-center'">
       <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-width="2"
               d="M16 11c1.7 0 3-1.8 3-4s-1.3-4-3-4-3 1.8-3 4 1.3 4 3 4zM8 11c1.7 0 3-1.8 3-4S9.7 3 8 3 5 4.8 5 7s1.3 4 3 4zm8 2c-2.2 0-4 1.8-4 4v3h8v-3c0-2.2-1.8-4-4-4zM8 13c-2.2 0-4 1.8-4 4v3h8v-3c0-2.2-1.8-4-4-4z"/>
       </svg>
-      <span class="truncate" x-show="openSidebar" x-transition>Pelanggan</span>
+      <span class="truncate" x-show="openSidebar" x-transition>Customer</span>
       <span x-show="!openSidebar"
             class="absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap rounded-lg bg-gray-800 text-white text-xs px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none transition">
-        Pelanggan
+        Customer
       </span>
     </a>
 
-    <a href="{{ route('admin.produksi.create') }}" aria-label="Tambah Produksi"
+    <a href="{{ url('#') }}" aria-label="Tambah Produksi"
        class="group relative flex items-center rounded-xl transition
               {{ request()->routeIs('admin.produksi.create') ? $activeCls : $idleCls }}"
        :class="openSidebar ? 'gap-3 px-3 py-2.5 justify-start' : 'gap-0 px-2 py-2.5 justify-center'">
@@ -79,7 +101,7 @@
 
 
   <div class="mt-auto p-2 lg:p-3 border-t border-white/50">
-    <form method="POST" action="{{ route('admin.logout') }}" class="w-full">
+    <form method="POST" action="{{ url('#') }}" class="w-full">
       @csrf
       <button
         class="w-full flex items-center gap-2 rounded-xl border border-white/60 bg-white/70 text-slate-800 shadow-soft transition hover:bg-white"
@@ -89,7 +111,7 @@
       </button>
     </form>
 
-    <a href="{{ route('tracking.form') }}"
+    <a href="{{ url('/') }}"
        class="mt-2 block text-center text-[11px] text-slate-500 hover:text-slate-700"
        x-show="openSidebar" x-transition>
       ← Kembali ke situs publik

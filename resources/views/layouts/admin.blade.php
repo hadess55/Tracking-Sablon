@@ -88,7 +88,7 @@
             items: [],
             async refresh() {
               try {
-                const res = await fetch('{{ route('admin.notif.customers') }}', {
+                const res = await fetch('{{ url('#') }}', {
                   headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 });
                 if (!res.ok) return;
@@ -145,7 +145,7 @@
             </template>
 
             <div class="border-t"></div>
-            <a href="{{ route('admin.customers.index', ['status' => 'menunggu']) }}"
+            <a href="{{ url('#') }}"
               class="block px-3 py-2 text-sm text-brand-600 hover:text-brand-700">
               Lihat semua yang menunggu
             </a>
@@ -164,9 +164,9 @@
                 <div class="text-xs text-slate-500 truncate">{{ auth()->user()->email ?? '' }}</div>
               </div>
               <div class="py-1 text-sm">
-                <a href="{{ route('admin.produksi.index') }}" class="block px-4 py-2 hover:bg-slate-50">Dashboard</a>
+                <a href="{{ url('#') }}" class="block px-4 py-2 hover:bg-slate-50">Dashboard</a>
                 <div class="border-t border-slate-100 my-1"></div>
-                <form method="POST" action="{{ route('admin.logout') }}">@csrf
+                <form method="POST" action="{{ route('logout') }}">@csrf
                   <button type="submit" class="w-full text-left px-4 py-2 hover:bg-slate-50">Keluar</button>
                 </form>
               </div>

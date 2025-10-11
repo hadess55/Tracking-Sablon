@@ -21,7 +21,7 @@
 </section>
 
 <div class="mx-auto max-w-3xl">
-  <form method="GET" action="{{ route('tracking') }}"
+  <form method="GET" action="#"
         class="flex items-stretch gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm ring-1 ring-transparent focus-within:ring-indigo-200">
 
     <div class="flex items-center px-3 text-slate-400">
