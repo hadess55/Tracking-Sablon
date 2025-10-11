@@ -46,6 +46,18 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    // app/Models/User.php
+    public function getAlamatLengkapAttribute(): string
+    {
+        return trim(collect([
+            $this->jalan,
+            ($this->rt || $this->rw) ? 'RT '.$this->rt.' / RW '.$this->rw : null,
+            $this->kelurahan, $this->kecamatan,
+            $this->kota_kab, $this->provinsi,
+            $this->kode_pos,
+        ])->filter()->implode(', '));
+    }
+
 
     public function pesanan() {
         return $this->hasMany(Pesanan::class, 'pengguna_id');

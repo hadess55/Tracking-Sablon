@@ -13,19 +13,20 @@ class CustomerAdminController extends Controller
     public function index(Request $request)
     {
         $q = trim((string) $request->q);
-
         $pelanggan = User::where('role','customer')
-            ->when($q, function ($x) use ($q) {
-                $x->where(function($y) use ($q) {
-                    $y->where('name','like',"%{$q}%")
-                      ->orWhere('email','like',"%{$q}%")
-                      ->orWhere('no_hp','like',"%{$q}%")
-                      ->orWhere('alamat','like',"%{$q}%");
-                });
-            })
+            ->when($q, fn($x)=>$x->where(function($y) use ($q){
+                $y->where('name','like',"%$q%")
+                ->orWhere('email','like',"%$q%")
+                ->orWhere('no_hp','like',"%$q%")
+                ->orWhere('jalan','like',"%$q%")
+                ->orWhere('kelurahan','like',"%$q%")
+                ->orWhere('kecamatan','like',"%$q%")
+                ->orWhere('kota_kab','like',"%$q%")
+                ->orWhere('provinsi','like',"%$q%");
+            }))
             ->latest()->paginate(12)->withQueryString();
-
         return view('admin.customer.index', compact('pelanggan','q'));
+
     }
 
     public function create()
@@ -43,7 +44,7 @@ class CustomerAdminController extends Controller
             'password' => ['required','string','min:6'],
             'no_hp'    => ['nullable','string','max:30','unique:users,no_hp'],
 
-            'alamat_jalan' => ['nullable','string','max:255'],
+            'jalan' => ['nullable','string','max:255'],
             'rt'           => ['nullable','string','max:5'],
             'rw'           => ['nullable','string','max:5'],
             'kelurahan'    => ['nullable','string','max:100'],
@@ -59,7 +60,7 @@ class CustomerAdminController extends Controller
             'password' => Hash::make($request->password),
             'role'  => 'customer',
             'no_hp' => $request->no_hp,
-            'alamat_jalan' => $request->jalan,
+            'jalan' => $request->jalan,
             'rt'           => $request->rt,
             'rw'           => $request->rw,
             'kelurahan'    => $request->kelurahan,
@@ -108,7 +109,7 @@ class CustomerAdminController extends Controller
         }
         $user->update($data);
 
-        return redirect()->route('admin.customer.index')->with('berhasil','Customer diperbarui.');
+        return redirect()->route('admin.customer.index')->with('berhasil','Data Customer diperbarui.');
     }
 
 

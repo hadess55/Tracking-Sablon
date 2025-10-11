@@ -6,43 +6,36 @@
     {{-- Page Header --}}
     <div class="mb-5 flex items-center justify-between">
         <div>
-            <nav class="text-sm text-gray-500 mb-1" aria-label="Breadcrumb">
-                <ol class="list-reset inline-flex items-center gap-2">
-                    <li><a href="{{ route('admin.pesanan.index') }}" class="hover:text-gray-700">Panel Admin</a></li>
-                    <li>/</li>
-                    <li class="text-gray-700 font-medium">Customer</li>
-                </ol>
-            </nav>
+            {{-- <nav class="text-sm text-gray-500 mb-1" aria-label="Breadcrumb">
             <h1 class="text-xl md:text-2xl font-semibold tracking-tight text-gray-900">Customer</h1>
-            <p class="text-sm text-gray-500 mt-1">Kelola akun customer: buat, ubah data, dan hapus.</p>
+
+            </nav> --}}
+
+            <form action="{{ route('admin.customer.index') }}" method="GET" class="ml-auto w-full md:w-96">
+            <div class="relative">
+                <input type="text" name="q" value="{{ $q }}"
+                       placeholder="Cari..."
+                       class="w-full rounded-lg border-gray-300 pl-10 pr-24 py-2.5 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                       autocomplete="off">
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M10 2a8 8 0 1 1-5.293 14.293l-3 3a1 1 0 1 1-1.414-1.414l3-3A8 8 0 0 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/></svg>
+                </div>
+                <button class="absolute right-1 top-1/2 -translate-y-1/2 rounded-md bg-indigo-600 px-3 py-1.5 text-white text-sm hover:bg-indigo-700">
+                    Cari
+                </button>
+            </div>
+        </form>
         </div>
 
         <div class="flex items-center gap-2">
             <a href="{{ route('admin.customer.create') }}"
                class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M11 11V6a1 1 0 1 1 2 0v5h5a1 1 0 1 1 0 2h-5v5a1 1 0 1 1-2 0v-5H6a1 1 0 1 1 0-2h5z"/></svg>
-                Tambah Customer
+                Tambah
             </a>
         </div>
     </div>
 
-    {{-- Top Toolbar --}}
-    <div class="mb-4 flex items-center gap-3">
-        <form action="{{ route('admin.customer.index') }}" method="GET" class="ml-auto w-full md:w-96">
-            <div class="relative">
-                <input type="text" name="q" value="{{ $q }}"
-                       placeholder="Cari nama / email / no hp / alamat"
-                       class="w-full rounded-lg border-gray-300 pl-10 pr-24 py-2.5 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                       autocomplete="off">
-                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M10 2a8 8 0 1 1-5.293 14.293l-3 3a1 1 0 1 1-1.414-1.414l3-3A8 8 0 0 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/></svg>
-                </div>
-                <button class="absolute right-1 top-1/2 -translate-y-1/2 rounded-md bg-gray-800 px-3 py-1.5 text-white text-sm hover:bg-gray-900">
-                    Cari
-                </button>
-            </div>
-        </form>
-    </div>
 
     {{-- Flash Messages --}}
     @if(session('berhasil'))
@@ -80,7 +73,9 @@
                 <tbody class="divide-y divide-gray-100">
                     @forelse($pelanggan as $c)
                         <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-gray-500">{{ $c->id }}</td>
+                            <td class="px-4 py-3 text-gray-500">
+                                {{ ($pelanggan->firstItem() ?? 0) + $loop->index }}
+                            </td>
                             <td class="px-4 py-3">
                                 <div class="font-medium text-gray-900">{{ $c->name }}</div>
                                 <div class="text-[11px] text-gray-500">Customer</div>
@@ -160,7 +155,7 @@
                         <div class="text-sm text-gray-600">{{ $c->email }}</div>
                         <div class="text-sm text-gray-600">{{ $c->no_hp ?? '—' }}</div>
                     </div>
-                    <span class="text-xs text-gray-500">#{{ $c->id }}</span>
+                    <span class="text-xs text-gray-500">#{{ ($pelanggan->firstItem() ?? 0) + $loop->index }}</span>
                 </div>
                 @php $alamat = $c->alamat_lengkap ?? null; @endphp
                 <div class="mt-3 text-sm text-gray-700">
