@@ -13,5 +13,8 @@ class Produksi extends Model {
   public function logs(){ return $this->hasMany(ProduksiLog::class)->latest(); }
 
   public function statusDef(){ return $this->belongsTo(ProduksiStatus::class,'status_key','key'); }
+  public function scopeSedang($q)  { return $q->where('status_key', '!=', 'selesai'); }
+public function scopeSelesai($q) { return $q->where('status_key', 'selesai'); }
+
 }
 

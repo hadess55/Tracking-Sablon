@@ -143,7 +143,7 @@
 
                 <td class="px-4 py-3 text-right space-x-2">
                   <a class="inline-flex px-3 py-2 rounded-lg border text-slate-700 hover:bg-white" href="{{ route('admin.produksi.show',$p) }}">Detail</a>
-                  <a class="inline-flex px-3 py-2 rounded-lg border text-slate-700 hover:bg-white" href="{{ route('admin.produksi.show',$p) }}#ubah-status">Ubah Status</a>
+                  <a class="inline-flex px-3 py-2 rounded-lg border text-slate-700 hover:bg-white" href="{{ route('admin.produksi.show',$p) }}#ubah-status">Status</a>
                   {{-- Hapus kalau memang diizinkan --}}
                   {{-- <form class="inline" method="POST" action="{{ route('admin.produksi.destroy',$p) }}">
                     @csrf @method('DELETE')

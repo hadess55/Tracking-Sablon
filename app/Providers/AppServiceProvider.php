@@ -5,7 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use App\Models\Produksi;
-
+use Illuminate\Support\Facades\Cache;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -21,11 +21,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // View::composer(['layouts.admin', 'partials.admin-sidebar'], function ($view) {
-        //     $sedangProses = Produksi::sedang()->count();
-        //     $selesai      = Produksi::selesai()->count();
+        View::composer('*', function ($view) {
+            [$sedangProses, $selesai] = Cache::remember('sidebar_produksi_stats', 30, function () {
+                // pilih salah satu cara hitung di bawah sesuai skema kamu
+                return [
+                    Produksi::sedang()->count(),
+                    Produksi::selesai()->count(),
+                ];
+            });
 
-        //     $view->with(compact('sedangProses', 'selesai'));
-        // });
+            $view->with(compact('sedangProses', 'selesai'));
+        });
+
     }
 }

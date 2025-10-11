@@ -81,44 +81,57 @@
             <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14v-3a6 6 0 1 0-12 0v3a2 2 0 0 1-.6 1.4L4 17h5m6 0v1a3 3 0 1 1-6 0v-1"/></svg>
           </button> --}}
           {{-- Bell Notifikasi Pelanggan Menunggu --}}
-        <div
-          x-data="{
-            open:false,
-            count: 0,
-            items: [],
-            async refresh() {
-              try {
-                const res = await fetch('{{ url('#') }}', {
-                  headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                });
-                if (!res.ok) return;
-                const data = await res.json();
-                this.count = data.count;
-                this.items = data.items;
-              } catch (_) {}
-            }
-          }"
-          x-init="
-            refresh();
-            setInterval(() => refresh(), 15000); // polling tiap 15 detik
-          "
-          class="relative"
-        >
-          <button @click="open = !open"
-                  class="relative inline-flex items-center justify-center w-9 h-9 rounded-full hover:bg-slate-100 focus:outline-none">
-
-            <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-width="2"
-                    d="M15 17h5l-1.4-1.4A2 2 0 0118 14.172V11a6 6 0 10-12 0v3.172a2 2 0 01-.6 1.428L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-            </svg>
+        {{-- Lonceng + dropdown notifikasi pesanan menunggu --}}
+<div x-data="notifPesanan({{ $pendingOrdersInitial ?? 0 }})" x-init="init()" class="relative" x-cloak>
+  <button type="button"
+          @click="open = !open"
+          @keydown.escape.window="open = false"
+          class="relative inline-flex items-center rounded-full p-1.5 hover:bg-slate-100 focus:outline focus:outline-2 focus:outline-indigo-500">
+    <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-width="1.8"
+        d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0a3 3 0 1 1-6 0" />
+    </svg>
+    <span x-show="count > 0"
+          x-text="count"
+          class="absolute -right-1 -top-1 min-w-[18px] rounded-full bg-rose-600 px-1.5 text-center text-[10px] font-bold text-white ring-2 ring-white">
+    </span>
+  </button>
 
 
-            <span x-show="count > 0"
-                  x-transition
-                  class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white text-[10px] leading-[18px] text-center font-semibold">
-              <span x-text="count"></span>
-            </span>
-          </button>
+  {{-- <div x-show="open"
+       x-transition
+       @click.outside="open = false"
+       class="absolute right-0 mt-2 w-80 rounded-xl border border-slate-200 bg-white shadow-xl overflow-hidden z-50">
+    <div class="px-3 py-2 border-b bg-slate-50">
+      <div class="text-sm font-semibold">Notifikasi</div>
+      <div class="text-xs text-slate-500">Pelanggan menunggu persetujuan</div>
+    </div>
+
+    <template x-if="count === 0">
+      <div class="p-4 text-sm text-slate-500">Tidak ada permintaan baru.</div>
+    </template>
+
+
+    <template x-for="c in items" :key="c.id">
+      <a :href="c.url" class="flex items-start justify-between gap-3 px-3 py-2 hover:bg-slate-50">
+        <div class="min-w-0">
+          <div class="text-sm font-medium truncate" x-text="c.nama"></div>
+          <div class="text-xs text-slate-500 truncate" x-text="c.email"></div>
+        </div>
+        <span class="text-[11px] text-slate-400 shrink-0" x-text="c.since"></span>
+      </a>
+    </template>
+
+    <div class="border-t"></div>
+    <a href="{{ route('admin.pesanan.index', ['status' => 'menunggu']) }}"
+       class="block px-3 py-2 text-sm text-indigo-600 hover:text-indigo-700">
+      Lihat semua yang menunggu
+    </a>
+  </div>
+</div> --}}
+
+
+
 
 
           <div x-show="open"
@@ -145,7 +158,7 @@
             </template>
 
             <div class="border-t"></div>
-            <a href="{{ url('#') }}"
+            <a href="{{ url('pesanan') }}"
               class="block px-3 py-2 text-sm text-brand-600 hover:text-brand-700">
               Lihat semua yang menunggu
             </a>
@@ -222,7 +235,52 @@ document.addEventListener('alpine:init', () => {
     },
   }));
 });
+function notifPesanan(initial = 0) {
+  return {
+    open: false,
+    count: Number(initial) || 0,
+    items: [],
+    timer: null,
+    init() {
+      this.fetch();
+      this.timer = setInterval(() => this.fetch(), 30000); // 30 detik
+    },
+    fetch() {
+      fetch('{{ route('admin.notif.pesanan') }}', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(r => r.json())
+        .then(d => {
+          this.count = Number(d?.pending ?? 0);
+          this.items = Array.isArray(d?.items) ? d.items : [];
+        })
+        .catch(() => {});
+    }
+  }
+}
+function produksiStat(initial = {sedang:0, selesai:0}) {
+  return {
+    sedang:  Number(initial.sedang)  || 0,
+    selesai: Number(initial.selesai) || 0,
+    timer: null,
+    init() {
+      this.fetch();                              // ambil pertama
+      this.timer = setInterval(() => this.fetch(), 30000); // 30 detik
+    },
+    fetch() {
+      fetch('{{ route('admin.produksi.stats') }}', {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(r => r.json())
+      .then(d => {
+        this.sedang  = Number(d?.sedang  ?? 0);
+        this.selesai = Number(d?.selesai ?? 0);
+      })
+      .catch(() => { /* diamkan jika gagal */ });
+    }
+  }
+}
+
 </script>
+
 
 </body>
 </html>

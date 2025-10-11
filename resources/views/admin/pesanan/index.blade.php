@@ -3,32 +3,64 @@
 
 @section('content')
 
-@php($active = $status ?? 'semua')
+@php
+  // style tombol tab
+  $tabBase  = 'inline-flex items-center rounded-full border px-3 py-1.5 text-sm whitespace-nowrap';
+  $tabIdle  = 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50';
+  $tabAct   = 'bg-indigo-600 text-white border-indigo-600';
+  $now = $status ?? 'semua'; // 'menunggu' | 'disetujui' | 'ditolak' | 'semua'
+@endphp
 
-<div class="mb-4 flex items-center gap-2">
-    @php($active = request('status', 'semua'))
+<div class="flex flex-col gap-3 sm:gap-4">
 
-<a href="{{ route('admin.pesanan.index') }}"
-   class="px-3 py-1 rounded-lg {{ $active==='semua' ? 'bg-indigo-600 text-white' : 'bg-gray-200' }}">Semua</a>
-<a href="{{ route('admin.pesanan.index', ['status'=>'menunggu']) }}"
-   class="px-3 py-1 rounded-lg {{ $active==='menunggu' ? 'bg-indigo-600 text-white' : 'bg-gray-200' }}">Menunggu</a>
-<a href="{{ route('admin.pesanan.index', ['status'=>'disetujui']) }}"
-   class="px-3 py-1 rounded {{ $active==='disetujui' ? 'bg-indigo-600 text-white' : 'bg-gray-200' }}">Disetujui</a>
-<a href="{{ route('admin.pesanan.index', ['status'=>'ditolak']) }}"
-   class="px-3 py-1 rounded-lg {{ $active==='ditolak' ? 'bg-indigo-600 text-white' : 'bg-gray-200' }}">Ditolak</a>
+  {{-- Baris 1: Tabs (scrollable di mobile) --}}
+  <div class="-mx-2 px-2 overflow-x-auto">
+    <div class="inline-flex gap-2">
+        <a href="{{ route('admin.pesanan.index') }}"
+         class="{{ $tabBase }} {{ $now==='semua' ? $tabAct : $tabIdle }}">
+         Semua
+      </a>
+      <a href="{{ route('admin.pesanan.index',['status'=>'menunggu']) }}"
+         class="{{ $tabBase }} {{ $now==='menunggu' ? $tabAct : $tabIdle }}">
+         Menunggu
+      </a>
+      <a href="{{ route('admin.pesanan.index',['status'=>'disetujui']) }}"
+         class="{{ $tabBase }} {{ $now==='disetujui' ? $tabAct : $tabIdle }}">
+         Disetujui
+      </a>
+      <a href="{{ route('admin.pesanan.index',['status'=>'ditolak']) }}"
+         class="{{ $tabBase }} {{ $now==='ditolak' ? $tabAct : $tabIdle }}">
+         Ditolak
+      </a>
+      
+    </div>
+  </div>
 
+  {{-- Baris 2: Search + Buat Pesanan (stack di mobile) --}}
+  <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-5">
+    <form action="{{ route('admin.pesanan.index') }}" method="GET" class="flex w-full gap-2 sm:w-auto">
+      {{-- kirim status aktif saat search --}}
+      @if($now && $now!=='semua') <input type="hidden" name="status" value="{{ $now }}"> @endif
 
-<form action="{{ route('admin.pesanan.index') }}" method="GET" class="ml-auto flex gap-2">
-    @if(request()->filled('status')) 
-        <input type="hidden" name="status" value="{{ request('status') }}">
-    @endif
-    <input type="text" name="q" value="{{ request('q') }}" class="border rounded px-3 py-1 w-72"
-           placeholder="Cari...">
-    <button class="px-3 py-1 rounded-lg bg-indigo-600 text-white">Cari</button>
-</form>
+      <div class="flex w-full sm:w-80 items-center gap-2">
+        <input name="q" value="{{ request('q') }}"
+               placeholder="Cari..."
+               class="flex-1 rounded-xl border border-slate-200 bg-white/80 px-3 py-2
+                      focus:border-indigo-500 focus:outline focus:outline-2 focus:outline-indigo-500">
+        <button class="rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-slate-700 hover:bg-white">
+          Cari
+        </button>
+      </div>
+    </form>
 
-    <a href="{{ route('admin.pesanan.create') }}" class="px-3 py-1 rounded-lg bg-indigo-600 text-white">+ Buat Pesanan</a>
+    <a href="{{ route('admin.pesanan.create') }}"
+       class="rounded-xl bg-indigo-600 px-4 py-2 text-center text-white hover:bg-indigo-700
+              w-full sm:w-auto">
+      + Buat Pesanan
+    </a>
+  </div>
 </div>
+
 
 
 

@@ -13,7 +13,6 @@
       <h1 class="font-semibold truncate">{{ $title }}</h1>
     </div>
 
-    {{-- Tengah: Search (md ke atas) --}}
     <div class="hidden md:block flex-1 max-w-xl mx-4">
       <form action="#" method="GET">
         <label class="relative block">
@@ -39,6 +38,7 @@
           <path stroke-linecap="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14v-3a6 6 0 1 0-12 0v3a2 2 0 0 1-.6 1.4L4 17h5m6 0v1a3 3 0 1 1-6 0v-1m6 0H9"/>
         </svg>
       </button>
+      
 
       {{-- Dropdown user --}}
       <div class="relative" x-data="{open:false}">
@@ -59,7 +59,6 @@
             <div class="text-xs text-slate-500 truncate">{{ auth()->user()->email ?? '' }}</div>
           </div>
           <div class="py-1 text-sm">
-            <a href="{{ route('admin.produksi.index') }}" class="block px-4 py-2 hover:bg-slate-50">Dashboard</a>
             <div class="border-t border-slate-100 my-1"></div>
             <form method="POST" action="{{ route('admin.logout') }}">
               @csrf

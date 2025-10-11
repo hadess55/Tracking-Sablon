@@ -8,14 +8,16 @@ use App\Http\Controllers\Admin\CustomerAdminController;
 use App\Http\Controllers\Admin\ProduksiAdminController;
 use App\Http\Controllers\Admin\ProduksiStatusController;
 use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\Admin\NotifController;
 
 Route::get('/', function () {
     return view('public.home');
 });
 
-Route::get('/dashboard', function () {
-    return view('admin.dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// routes/web.php
+Route::middleware(['auth','admin'])->get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])
+    ->name('dashboard');
+
 
 Route::get('/tracking/{resi}', [TrackingController::class,'show'])->name('tracking.show');
 
@@ -32,6 +34,8 @@ Route::middleware('auth')->group(function () {
 
     // Admin
     Route::middleware(['auth','admin'])->prefix('admin')->name('admin.')->group(function () {
+        
+
         Route::get('/produksi', [ProduksiAdminController::class,'index'])->name('produksi.index');
         Route::get('/produksi/{produksi}', [ProduksiAdminController::class,'show'])->name('produksi.show');
         Route::put('/produksi/{produksi}', [ProduksiAdminController::class,'update'])->name('produksi.update');
@@ -47,6 +51,11 @@ Route::middleware('auth')->group(function () {
         Route::resource('customer', CustomerAdminController::class)->parameters([
             'customer' => 'user'
         ])->except(['show']);
+
+        Route::get('/notif/pesanan', [NotifController::class, 'pendingPesanan'])
+        ->name('notif.pesanan');
+        Route::get('/produksi/stats', [ProduksiAdminController::class,'stats'])
+        ->name('produksi.stats');
 
     });
 });

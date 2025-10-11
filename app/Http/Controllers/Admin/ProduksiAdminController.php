@@ -105,5 +105,19 @@ class ProduksiAdminController extends Controller
 
     return response()->json(['items'=>$items]);
 }
+
+public function stats()
+{
+    // Jika kamu pakai tabel produksi_statuses dengan kolom is_final:
+    $sedang  = Produksi::whereHas('statusDef', fn($q) => $q->where('is_final', false))->count();
+    $selesai = Produksi::whereHas('statusDef', fn($q) => $q->where('is_final', true))->count();
+
+    // Kalau TIDAK pakai is_final dan hanya mengandalkan key "selesai",
+    // pakai ini saja:
+    // $sedang  = Produksi::where('status_key','!=','selesai')->count();
+    // $selesai = Produksi::where('status_key','selesai')->count();
+
+    return response()->json(['sedang' => $sedang, 'selesai' => $selesai]);
+}
 }
 
