@@ -12,18 +12,27 @@ class Pesanan extends Model
 
     protected $table = 'pesanan';
     protected $fillable = [
-        'pengguna_id',
-        'judul',
-        'deskripsi',
-        'jumlah',
-        'status',
-        'nomor_resi',
-        'disetujui_oleh',
-        'tanggal_disetujui',
-        'alasan_ditolak'
+        'pengguna_id','produk','deskripsi','jumlah','status',
+        'nomor_resi','disetujui_oleh','tanggal_disetujui','alasan_ditolak',
+        'bahan','warna','ukuran_kaos','tautan_drive'
     ];
 
-    protected $casts = ['tanggal_disetujui' => 'datetime'];
+    protected $casts = [
+        'tanggal_disetujui' => 'datetime',
+        'ukuran_kaos' => 'array',
+    ];
+
+    public function getUkuranRingkasAttribute(): string
+    {
+        $u = $this->ukuran_kaos ?: [];
+        $pairs = [];
+        foreach (['S','M','L','XL','XXL'] as $sz) {
+            $n = (int)($u[$sz] ?? 0);
+            if ($n > 0) $pairs[] = "{$sz}:{$n}";
+        }
+        return implode(', ', $pairs) ?: '—';
+    }
+    
 
     public function pengguna() {
         return $this->belongsTo(User::class, 'pengguna_id');

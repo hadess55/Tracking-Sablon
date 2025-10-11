@@ -1,147 +1,112 @@
 @extends('layouts.admin')
-
-@section('header', 'Pesanan')
+@section('header','Pesanan')
 
 @section('content')
 
-    {{-- Filter & Pencarian --}}
-    <div class="mb-4 flex items-center gap-2">
-        <a href="{{ route('admin.pesanan.index', ['status' => 'menunggu']) }}"
-           class="px-3 py-1 rounded {{ request('status','menunggu')==='menunggu' ? 'bg-blue-600 text-white' : 'bg-gray-200' }}">
-            Menunggu
-        </a>
-        <a href="{{ route('admin.pesanan.index', ['status' => 'disetujui']) }}"
-           class="px-3 py-1 rounded {{ request('status')==='disetujui' ? 'bg-blue-600 text-white' : 'bg-gray-200' }}">
-            Disetujui
-        </a>
-        <a href="{{ route('admin.pesanan.index', ['status' => 'ditolak']) }}"
-           class="px-3 py-1 rounded {{ request('status')==='ditolak' ? 'bg-blue-600 text-white' : 'bg-gray-200' }}">
-            Ditolak
-        </a>
+@php($active = $status ?? 'semua')
 
-        <form action="{{ route('admin.pesanan.index') }}" method="GET" class="ml-auto flex gap-2">
-            <input type="hidden" name="status" value="{{ request('status','menunggu') }}">
-            <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari judul / resi / nama"
-                   class="border rounded px-3 py-1 w-64">
-            <button class="px-3 py-1 rounded bg-gray-800 text-white">Cari</button>
-        </form>
-    </div>
+<div class="mb-4 flex items-center gap-2">
+    @php($active = request('status', 'semua'))
 
-    {{-- Flash message --}}
-    @if(session('berhasil'))
-        <div class="mb-4 p-3 rounded bg-green-100 text-green-800">
-            {{ session('berhasil') }}
-        </div>
+<a href="{{ route('admin.pesanan.index') }}"
+   class="px-3 py-1 rounded-lg {{ $active==='semua' ? 'bg-indigo-600 text-white' : 'bg-gray-200' }}">Semua</a>
+<a href="{{ route('admin.pesanan.index', ['status'=>'menunggu']) }}"
+   class="px-3 py-1 rounded-lg {{ $active==='menunggu' ? 'bg-indigo-600 text-white' : 'bg-gray-200' }}">Menunggu</a>
+<a href="{{ route('admin.pesanan.index', ['status'=>'disetujui']) }}"
+   class="px-3 py-1 rounded {{ $active==='disetujui' ? 'bg-indigo-600 text-white' : 'bg-gray-200' }}">Disetujui</a>
+<a href="{{ route('admin.pesanan.index', ['status'=>'ditolak']) }}"
+   class="px-3 py-1 rounded-lg {{ $active==='ditolak' ? 'bg-indigo-600 text-white' : 'bg-gray-200' }}">Ditolak</a>
+
+
+<form action="{{ route('admin.pesanan.index') }}" method="GET" class="ml-auto flex gap-2">
+    @if(request()->filled('status')) 
+        <input type="hidden" name="status" value="{{ request('status') }}">
     @endif
-    @if(session('peringatan'))
-        <div class="mb-4 p-3 rounded bg-yellow-100 text-yellow-800">
-            {{ session('peringatan') }}
-        </div>
-    @endif
-    @if ($errors->any())
-        <div class="mb-4 p-3 rounded bg-red-100 text-red-800">
-            <ul class="list-disc ml-5">
-                @foreach ($errors->all() as $e)
-                    <li>{{ $e }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    <input type="text" name="q" value="{{ request('q') }}" class="border rounded px-3 py-1 w-72"
+           placeholder="Cari...">
+    <button class="px-3 py-1 rounded-lg bg-indigo-600 text-white">Cari</button>
+</form>
 
-    {{-- Tabel Pesanan --}}
-    <div class="overflow-x-auto bg-white rounded shadow">
-        <table class="min-w-full text-sm">
-            <thead class="bg-gray-100 text-left">
-            <tr>
-                <th class="px-3 py-2">ID</th>
-                <th class="px-3 py-2">Customer</th>
-                <th class="px-3 py-2">Judul</th>
-                <th class="px-3 py-2">Jumlah</th>
-                <th class="px-3 py-2">Status</th>
-                <th class="px-3 py-2">Nomor Resi</th>
-                <th class="px-3 py-2 w-56">Aksi</th>
-            </tr>
-            </thead>
-            <tbody>
-            @forelse($pesanan as $p)
-                <tr class="border-t">
-                    <td class="px-3 py-2">{{ $p->id }}</td>
-                    <td class="px-3 py-2">
-                        {{ $p->pengguna->name ?? '-' }}<br>
-                        <span class="text-xs text-gray-500">{{ $p->pengguna->email ?? '' }}</span>
-                    </td>
-                    <td class="px-3 py-2">
-                        <div class="font-medium">{{ $p->judul }}</div>
-                        @if($p->deskripsi)
-                            <div class="text-xs text-gray-600 line-clamp-2">{{ $p->deskripsi }}</div>
-                        @endif
-                        <div class="text-[11px] text-gray-500">Dibuat: {{ $p->created_at->format('d M Y H:i') }}</div>
-                    </td>
-                    <td class="px-3 py-2">{{ $p->jumlah }}</td>
-                    <td class="px-3 py-2">
-                        @php
-                            $badge = [
-                                'menunggu' => 'bg-yellow-100 text-yellow-800',
-                                'disetujui' => 'bg-green-100 text-green-800',
-                                'ditolak' => 'bg-red-100 text-red-800',
-                            ][$p->status] ?? 'bg-gray-100 text-gray-800';
-                        @endphp
-                        <span class="px-2 py-1 rounded text-xs {{ $badge }}">{{ Str::ucfirst($p->status) }}</span>
-                        @if($p->tanggal_disetujui)
-                            <div class="text-[11px] text-gray-500 mt-1">Disetujui: {{ $p->tanggal_disetujui->format('d M Y H:i') }}</div>
-                        @endif
-                    </td>
-                    <td class="px-3 py-2">
-                        @if($p->nomor_resi)
-                            <code class="text-xs">{{ $p->nomor_resi }}</code>
-                        @else
-                            <span class="text-gray-400 text-xs">-</span>
-                        @endif
-                    </td>
-                    <td class="px-3 py-2">
-                        @if($p->status === 'menunggu')
-                            <div class="flex items-center gap-2">
-                                {{-- Setujui --}}
-                                <form action="{{ route('admin.pesanan.setujui', $p) }}" method="POST"
-                                      onsubmit="return confirm('Setujui pesanan #{{ $p->id }}? Nomor resi akan digenerate.')">
-                                    @csrf
-                                    <button class="px-3 py-1 rounded bg-green-600 text-white">Setujui</button>
-                                </form>
+    <a href="{{ route('admin.pesanan.create') }}" class="px-3 py-1 rounded-lg bg-indigo-600 text-white">+ Buat Pesanan</a>
+</div>
 
-                                {{-- Tolak (toggle alasan) --}}
-                                <details class="relative">
-                                    <summary class="list-none px-3 py-1 rounded bg-red-600 text-white cursor-pointer">
-                                        Tolak
-                                    </summary>
-                                    <div class="absolute z-10 mt-2 p-3 bg-white border rounded shadow w-64">
-                                        <form action="{{ route('admin.pesanan.tolak', $p) }}" method="POST">
-                                            @csrf
-                                            <label class="text-xs text-gray-600">Alasan penolakan</label>
-                                            <textarea name="alasan" rows="3" class="w-full border rounded p-2 text-sm" required></textarea>
-                                            <div class="mt-2 flex justify-end gap-2">
-                                                <button type="submit" class="px-3 py-1 rounded bg-red-600 text-white text-sm">Kirim</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </details>
-                            </div>
-                        @else
-                            <div class="text-xs text-gray-600">Tidak ada aksi</div>
-                        @endif
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="7" class="px-3 py-6 text-center text-gray-500">Belum ada data.</td>
-                </tr>
-            @endforelse
-            </tbody>
-        </table>
-    </div>
 
-    {{-- Pagination --}}
-    <div class="mt-4">
-        {{ $pesanan->appends(['status'=>request('status'),'q'=>request('q')])->links() }}
-    </div>
 
+<div class="overflow-x-auto bg-white border rounded-xl shadow-sm">
+<table class="min-w-full text-sm">
+    <thead class="bg-gray-50 text-left">
+        <tr>
+            <th class="px-3 py-2">ID</th>
+            <th class="px-3 py-2">Customer</th>
+            <th class="px-3 py-2">Produk</th>
+            <th class="px-3 py-2">Bahan</th>
+            <th class="px-3 py-2">Ukuran</th>
+            <th class="px-3 py-2">Jumlah</th>
+            <th class="px-3 py-2">Warna</th>
+            <th class="px-3 py-2">Nomor Resi</th>
+            <th class="px-3 py-2">Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        @forelse($pesanan as $o)
+        <tr class="border-t">
+            <td class="px-3 py-2">{{ $o->id }}</td>
+            <td class="px-3 py-2">
+                <div class="font-medium">{{ $o->pengguna->name ?? '-' }}</div>
+                <div class="text-xs text-gray-500">{{ $o->pengguna->email ?? '' }}</div>
+            </td>
+            <td class="px-3 py-2">
+                <div class="font-medium">{{ $o->produk }}</div>
+
+                @if($o->tautan_drive)
+                    <div class="text-xs">
+                        <a class="text-indigo-600 underline" href="{{ $o->tautan_drive }}" target="_blank" rel="noopener">Link drive</a>
+                    </div>
+                @endif
+
+                @if($o->deskripsi)
+                    <div class="text-xs text-gray-500" title="{{ $o->deskripsi }}">
+                        {{ Str::limit($o->deskripsi, 20) }}
+                        {{-- {{ Str::words($o->deskripsi, 3, '…') }} --}}
+                    </div>
+                @endif
+            </td>
+
+            <td class="px-3 py-2">{{ $o->bahan ?: '—' }}</td>
+            <td class="px-3 py-2">{{ $o->ukuran_ringkas }}</td>
+            <td class="px-3 py-2">{{ $o->jumlah }}</td>
+            <td class="px-3 py-2">{{ $o->warna ?: '—' }}</td>
+            <td class="px-3 py-2">
+                @if($o->nomor_resi)<code class="text-xs">{{ $o->nomor_resi }}</code>@else<span class="text-gray-400">—</span>@endif
+            </td>
+            <td class="px-3 py-2">
+                <div class="flex items-center gap-2">
+                    <a href="{{ route('admin.pesanan.show',$o) }}" class="underline">Lihat</a>
+                    @if($o->status==='menunggu')
+                        <a href="{{ route('admin.pesanan.edit',$o) }}" class="underline">Edit</a>
+                        <form method="POST" class="inline" action="{{ route('admin.pesanan.setujui',$o) }}">
+                            @csrf <button class="px-2 py-1 bg-green-600 text-white rounded">Setujui</button>
+                        </form>
+                        <details class="inline-block">
+                            <summary class="px-2 py-1 bg-red-600 text-white rounded cursor-pointer">Tolak</summary>
+                            <form method="POST" action="{{ route('admin.pesanan.tolak',$o) }}" class="mt-2">
+                                @csrf
+                                <textarea name="alasan" rows="2" class="border p-1 w-56" placeholder="Alasan penolakan" required></textarea>
+                                <button class="mt-1 px-2 py-1 bg-red-600 text-white rounded">Kirim</button>
+                            </form>
+                        </details>
+                    @endif
+                </div>
+            </td>
+        </tr>
+        @empty
+        <tr><td colspan="9" class="px-3 py-10 text-center text-gray-500">Belum ada data.</td></tr>
+        @endforelse
+    </tbody>
+</table>
+</div>
+
+@if($pesanan->hasPages())
+<div class="mt-3">{{ $pesanan->links() }}</div>
+@endif
 @endsection

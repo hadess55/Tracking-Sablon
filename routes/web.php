@@ -25,8 +25,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Admin
-    Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
-        Route::get('/pesanan', [PesananAdminController::class, 'index'])->name('pesanan.index');
+    Route::middleware(['auth','admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::resource('pesanan', PesananAdminController::class)->parameters([
+            'pesanan' => 'pesanan'
+        ]);
         Route::post('/pesanan/{pesanan}/setujui', [PesananAdminController::class, 'setujui'])->name('pesanan.setujui');
         Route::post('/pesanan/{pesanan}/tolak', [PesananAdminController::class, 'tolak'])->name('pesanan.tolak');
         Route::resource('customer', CustomerAdminController::class)->parameters([
