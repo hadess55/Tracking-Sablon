@@ -72,11 +72,11 @@
           Ingat saya
         </label>
 
-        @if (Route::has('password.request'))
+        {{-- @if (Route::has('password.request'))
           <a class="text-sm text-brand-600 hover:text-brand-700" href="{{ route('password.request') }}">
             Lupa kata sandi?
           </a>
-        @endif
+        @endif --}}
       </div>
 
       <div class="flex items-center gap-3 pt-1">
