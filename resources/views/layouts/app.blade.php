@@ -31,6 +31,10 @@
             <main class="mt-5">
                 @yield('content')
             </main>
+
+            <p class="p-10 text-center text-xs text-slate-500">
+                © {{ date('Y') }} Tracking Produksi Sablon • by OlympusProject
+            </p>
         </div>
     </body>
 </html>
