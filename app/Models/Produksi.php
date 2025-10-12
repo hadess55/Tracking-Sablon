@@ -10,6 +10,10 @@ class Produksi extends Model {
   protected $casts = ['mulai_at'=>'datetime','selesai_at'=>'datetime'];
 
   public function pesanan(){ return $this->belongsTo(Pesanan::class); }
+  public function pelanggan()
+  {
+      return $this->belongsTo(User::class, 'pelanggan_id');
+  }
   public function logs(){ return $this->hasMany(ProduksiLog::class)->latest(); }
 
   public function statusDef(){ return $this->belongsTo(ProduksiStatus::class,'status_key','key'); }

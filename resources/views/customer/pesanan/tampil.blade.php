@@ -2,6 +2,10 @@
 @section('title','Detail Pesanan')
 
 @section('content')
+<div class="fixed inset-0 -z-10">
+    <div class="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-indigo-50 to-transparent"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(rgba(99,102,241,.12)_1px,transparent_1px)] [background-size:16px_16px]"></div>
+  </div>
 @php
   $status = strtolower($pesanan->status);
   $badgeClass = match($status){

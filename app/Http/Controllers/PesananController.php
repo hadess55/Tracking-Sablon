@@ -68,10 +68,10 @@ class PesananController extends Controller
             'warna'       => $data['warna'],
             'drive_link'  => $data['drive_link'] ?? null,
             'deskripsi'   => $data['deskripsi'] ?? null,
-            'ukuran'      => $uk,                  // simpan sebagai JSON (cast di model)
+            'ukuran'      => $uk,              
             'jumlah'      => $jumlah,
-            'status'      => 'menunggu',          // default: menunggu persetujuan admin
-            // 'nomor_resi' => null,               // diisi saat admin setujui
+            'status'      => 'menunggu',         
+            // 'nomor_resi' => null,        
         ]);
 
         return redirect()
@@ -85,10 +85,17 @@ class PesananController extends Controller
     /** GET /pesanan/{pesanan} (detail pesanan customer) */
     // app/Http/Controllers/PesananController.php
     public function tampil(Pesanan $pesanan)
-    {
-        $this->authorize('view', $pesanan);
-        return view('customer.pesanan.tampil', compact('pesanan'));
+{
+    $user = Auth::user();
+
+    $isOwner = $pesanan->pelanggan_id == $user->id;
+
+    if ($user->role !== 'customer' && ! $isOwner) {
+        abort(404);
     }
+
+    return view('customer.pesanan.tampil', compact('pesanan'));
+}
 
 
 }

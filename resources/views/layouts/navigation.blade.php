@@ -31,7 +31,7 @@
                         <x-nav-link :href="route('login')" :active="request()->routeIs('login')">
                             {{ __('Login') }}
                         </x-nav-link>
-                        <x-nav-link :href="url('/')" :active="request()->routeIs('/')">
+                        <x-nav-link :href="url('/')" :active="request()->routeIs('home')">
                             {{ __('Home') }}
                         </x-nav-link>
                     @else
@@ -42,12 +42,12 @@
                             </x-nav-link>
                             {{-- tambahkan link admin lain di sini jika perlu --}}
                         @elseif ($isCustomer)
-                            <x-nav-link :href="url('/')" :active="request()->routeIs('/')">
+                            <x-nav-link :href="url('/')" :active="request()->routeIs('home')">
                                 {{ __('Home') }}
                             </x-nav-link>
 
                             <x-nav-link :href="$routePesanIndex"
-                                        :active="request()->routeIs('customer.pesanan') || request()->routeIs('pesanan')">
+                                        :active="request()->routeIs('customer.pesanan') || request()->routeIs('pesanan.index')">
                                 {{ __('Pesanan Saya') }}
                             </x-nav-link>
 
@@ -107,7 +107,7 @@
 
         <div class="pt-2 pb-3 space-y-1">
             @guest
-                <x-responsive-nav-link :href="url('/')" :active="request()->routeIs('/')">
+                <x-responsive-nav-link :href="url('/')" :active="request()->routeIs('home')">
                     {{ __('Home') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('login')" :active="request()->routeIs('login')">
@@ -119,7 +119,7 @@
                         {{ __('Dashboard') }}
                     </x-responsive-nav-link>
                 @elseif ($isCustomer)
-                <x-responsive-nav-link :href="url('/')" :active="request()->routeIs('/')">
+                <x-responsive-nav-link :href="url('/')" :active="request()->routeIs('home')">
                     {{ __('Home') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="$routePesanIndex"

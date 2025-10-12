@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use App\Models\Produksi;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Blade;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -32,6 +33,8 @@ class AppServiceProvider extends ServiceProvider
 
             $view->with(compact('sedangProses', 'selesai'));
         });
+
+        Blade::component('layouts.auth', 'layouts.auth');
 
     }
     protected $policies = [

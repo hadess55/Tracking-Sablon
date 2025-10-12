@@ -10,16 +10,17 @@ use App\Http\Controllers\Admin\ProduksiStatusController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\Admin\NotifController;
 
-Route::get('/', function () {
-    return view('public.home');
-}); 
+// Route::get('/', function () {
+//     return view('public.home');
+// });
+Route::get('/', [TrackingController::class, 'index'])->name('home');
 
-// routes/web.php
+
 Route::middleware(['auth','admin'])->get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])
     ->name('dashboard');
 
-
-Route::get('/tracking/{resi}', [TrackingController::class,'show'])->name('tracking.show');
+Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking.index');
+Route::get('/tracking/{resi}', [TrackingController::class, 'show'])->name('tracking.show');
 
 
 Route::middleware('auth')->group(function () {
