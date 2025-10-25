@@ -190,7 +190,7 @@ class PesananAdminController extends Controller
          $namaPelanggan = $pelanggan->name ?? '-';
             $nomorResi     = $pesanan->nomor_resi ?? '-';
             $namaProduk    = $pesanan->produk ?? '-';
-            $jumlahTotal   = $pesanan->jumlah_total ?? '-';
+            $jumlahTotal   = $pesanan->jumlah ?? '-';
 
             $pesanWa  = "Halo {$namaPelanggan}, pesanan kamu sudah DISETUJUI 🎉\n\n";
             $pesanWa .= "Nomor Resi / Tracking: {$nomorResi}\n";
