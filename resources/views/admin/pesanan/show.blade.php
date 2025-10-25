@@ -83,6 +83,10 @@
         <dt class="text-gray-500">Jumlah</dt>
         <dd class="mt-1 font-medium text-gray-900">{{ $pesanan->jumlah }}</dd>
       </div>
+      <div>
+        <dt class="text-gray-500">Alasan ditolak</dt>
+        <dd class="mt-1">{{ $pesanan->alasan_ditolak ?: '—' }}</dd>
+      </div>
     </dl>
   </div>
 

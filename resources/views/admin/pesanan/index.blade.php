@@ -100,9 +100,9 @@
                     <div class="text-xs text-gray-500" title="{{ $o->deskripsi }}">
                         {{ Str::limit($o->deskripsi, 20) }}
                         {{-- {{ Str::words($o->deskripsi, 3, '…') }} --}}
-                    </div>
+                    </div> 
                 @endif
-            </td>
+            </td>`
 
             <td class="px-3 py-2">{{ $o->bahan ?: '—' }}</td>
             <td class="px-3 py-2">{{ $o->ukuran_ringkas }}</td>
