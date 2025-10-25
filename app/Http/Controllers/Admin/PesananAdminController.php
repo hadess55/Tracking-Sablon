@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use App\Services\FonnteService;
+use Illuminate\Support\Facades\Log;
 
 class PesananAdminController extends Controller
 {
@@ -123,40 +125,105 @@ class PesananAdminController extends Controller
         return redirect()->route('admin.pesanan.index')->with('berhasil','Pesanan dihapus.');
     }
 
-    // APPROVE / REJECT tetap
-    public function setujui(Pesanan $pesanan)
-    {
-        if ($pesanan->status !== 'menunggu') return back()->with('peringatan','Sudah diproses.');
 
-        DB::transaction(function () use ($pesanan) {
-            // Pastikan pesanan punya resi
-            if (blank($pesanan->nomor_resi)) {
-                $pesanan->nomor_resi = $this->buatNomorResi();
+    public function setujui(Request $request, Pesanan $pesanan)
+{
+    if ($pesanan->status !== 'menunggu') {
+        return back()->with([
+            'peringatan' => 'Pesanan sudah diproses.'
+        ]);
+    }
+
+    // 1. Pastikan nomor resi ada
+    if (blank($pesanan->nomor_resi)) {
+        $pesanan->nomor_resi = $this->buatNomorResi(); // sesuai fungsi kamu
+    }
+
+    // 2. Update status pesanan
+    $pesanan->update([
+        'status'            => 'disetujui',
+        'disetujui_oleh'    => Auth::id(),
+        'tanggal_disetujui' => now(),
+        'nomor_resi'        => $pesanan->nomor_resi,
+    ]);
+
+    // 3. Buat produksi (kalau logic kamu memang bikin Produksi setelah disetujui)
+    $produksi = Produksi::firstOrCreate(
+        ['pesanan_id' => $pesanan->id],
+        [
+            'nomor_resi' => $pesanan->nomor_resi,
+            'status_key' => ProduksiStatus::orderBy('urutan')->value('key') ?? 'desain',
+            'mulai_at'   => now(),
+        ]
+    );
+
+    // catat log awal produksi, kalau kamu memang logging seperti ini
+    $produksi->logs()->create([
+        'status_key'   => ProduksiStatus::orderBy('urutan')->value('key') ?? 'desain',
+        'catatan'      => 'Produksi dibuat dari persetujuan pesanan',
+        'created_by'   => Auth::id(),
+    ]);
+
+
+    $pelanggan = $pesanan->pengguna ?? null; 
+
+
+    if ($pelanggan) {
+
+        $rawPhone = $pelanggan->no_hp ?? null;
+
+        $targetPhone = null;
+        if ($rawPhone) {
+            $clean = preg_replace('/[^0-9]/', '', $rawPhone);
+
+            if (Str::startsWith($clean, '0')) {
+
+                $targetPhone = '62' . substr($clean, 1);
+            } elseif (Str::startsWith($clean, '62')) {
+                $targetPhone = $clean;
+            } else {
+                $targetPhone = $clean;
+            }
+        }
+
+        // Siapkan pesan
+         $namaPelanggan = $pelanggan->name ?? '-';
+            $nomorResi     = $pesanan->nomor_resi ?? '-';
+            $namaProduk    = $pesanan->produk ?? '-';
+            $jumlahTotal   = $pesanan->jumlah_total ?? '-';
+
+            $pesanWa  = "Halo {$namaPelanggan}, pesanan kamu sudah DISETUJUI 🎉\n\n";
+            $pesanWa .= "Nomor Resi / Tracking: {$nomorResi}\n";
+            $pesanWa .= "Produk: {$namaProduk}\n";
+            $pesanWa .= "Jumlah: {$jumlahTotal} pcs\n\n";
+            $pesanWa .= "Kami akan mulai proses produksi. Kamu bisa cek progres di halaman tracking kami, atau hubungi admin jika ada perubahan.\n\n";
+            $pesanWa .= "Terima kasih 🙌";
+
+            if ($targetPhone) {
+                try {
+                    $ok = FonnteService::sendMessage($targetPhone, $pesanWa);
+
+                    if (!$ok) {
+                        Log::warning('FonnteService::sendMessage retur false', [
+                            'phone' => $targetPhone,
+                        ]);
+                    }
+                } catch (\Throwable $e) {
+                    Log::error('Gagal kirim WA via Fonnte', [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+                }
+            } else {
+                Log::warning('No phone to send WA', [
+                    'user_id' => $pelanggan->id ?? null,
+                    'no_hp_raw' => $pelanggan->no_hp ?? null,
+                ]);
             }
 
-            $pesanan->update([
-                'status'            => 'disetujui',
-                'disetujui_oleh'    => Auth::id(), 
-                'tanggal_disetujui' => now(),
-                'nomor_resi'        => $pesanan->nomor_resi,
-            ]);
 
-            // Buat produksi hanya jika belum ada
-            Produksi::firstOrCreate(
-                ['pesanan_id' => $pesanan->id],
-                [
-                    'nomor_resi' => $pesanan->nomor_resi,          
-                    'status_key' => ProduksiStatus::orderBy('urutan')->value('key') ?? 'desain',
-                    'mulai_at'   => now(),
-                ]
-            )->logs()->create([
-                'status_key' => ProduksiStatus::orderBy('urutan')->value('key') ?? 'desain',
-                'catatan'    => 'Produksi dibuat dari persetujuan pesanan',
-                'created_by' => Auth::id(),
-            ]);
-        });
-
-        return back()->with('berhasil','Disetujui & produksi dibuat.');
+            return back()->with('berhasil', 'Pesanan disetujui & notifikasi dikirim.');
+        }
     }
 
 
