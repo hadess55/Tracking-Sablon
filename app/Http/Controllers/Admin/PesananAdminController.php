@@ -197,7 +197,7 @@ class PesananAdminController extends Controller
             $pesanWa .= "Nomor Resi / Tracking: {$nomorResi}\n";
             $pesanWa .= "Produk: {$namaProduk}\n";
             $pesanWa .= "Jumlah: {$jumlahTotal} pcs\n";
-            $pesanWa .= "Jumlah: {$catatan} pcs\n\n";
+            $pesanWa .= "Catatan: {$catatan} pcs\n\n";
             $pesanWa .= "Kami akan mulai proses produksi. Kamu bisa cek progres di halaman tracking kami, atau hubungi admin jika ada perubahan.\n\n";
             $pesanWa .= "Terima kasih 🙌";
 
