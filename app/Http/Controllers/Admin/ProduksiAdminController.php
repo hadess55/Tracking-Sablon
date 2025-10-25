@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Produksi;
+use Illuminate\Support\Facades\Log;
+use App\Services\FonnteService;
 use App\Models\ProduksiStatus;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -41,21 +43,21 @@ class ProduksiAdminController extends Controller
   public function update(Request $r, Produksi $produksi)
 {
     $r->validate([
-        // salah satu harus ada
+
         'status_key'   => ['nullable','exists:produksi_status,key'],
         'status_label' => ['required_without:status_key','string','max:100'],
         'progress'     => ['nullable','integer','min:0','max:100'],
         'catatan'      => ['nullable','string','max:2000'],
     ]);
 
-    // Ambil/ buat status
     if ($r->filled('status_key')) {
-        $key = $r->string('status_key');
+        $key    = $r->string('status_key');
         $status = ProduksiStatus::where('key',$key)->firstOrFail();
     } else {
-        // user mengetik label baru
+        // admin ketik status manual
         $label = trim($r->string('status_label'));
-        $key = Str::slug($label); // contoh pembuatan key
+        $key   = Str::slug($label);
+
         $status = ProduksiStatus::firstOrCreate(
             ['key' => $key],
             [
@@ -66,6 +68,10 @@ class ProduksiAdminController extends Controller
         );
     }
 
+
+    $oldStatusKey   = $produksi->status_key;
+    $oldProgress    = $produksi->progress;
+
     $produksi->update([
         'status_key' => $status->key,
         'progress'   => $r->filled('progress') ? (int)$r->progress : null,
@@ -73,11 +79,116 @@ class ProduksiAdminController extends Controller
         'selesai_at' => ($status->is_final ? now() : null),
     ]);
 
-    $produksi->logs()->create([
+
+    $log = $produksi->logs()->create([
         'status_key' => $status->key,
         'catatan'    => $r->catatan,
-        'created_by' => Auth::id(), 
+        'created_by' => Auth::id(),
     ]);
+
+    $statusBerubah  = $oldStatusKey !== $status->key;
+    $progressBerubah = $oldProgress != ($r->filled('progress') ? (int)$r->progress : null);
+
+    if ($statusBerubah || $progressBerubah) {
+
+        $pelanggan = $produksi->pelanggan
+            ?? ($produksi->pesanan->pengguna ?? null);
+
+        if ($pelanggan) {
+            $namaPelanggan = $pelanggan->name
+                ?? $pelanggan->nama_lengkap
+                ?? $pelanggan->nama
+                ?? '-';
+
+            $rawPhone = $pelanggan->no_hp
+                ?? $pelanggan->phone
+                ?? $pelanggan->telp
+                ?? null;
+
+
+            $targetPhone = null;
+            if ($rawPhone) {
+                $clean = preg_replace('/[^0-9]/', '', $rawPhone); // buang spasi/titik/+
+                if (Str::startsWith($clean, '0')) {
+                    $targetPhone = '62' . substr($clean, 1);
+                } elseif (Str::startsWith($clean, '62')) {
+                    $targetPhone = $clean;
+                } else {
+                    $targetPhone = $clean;
+                }
+            }
+
+
+            $nomorProduksi = $produksi->nomor_produksi
+                ?? $produksi->nomor_resi
+                ?? $produksi->id;
+
+            $produkNama = $produksi->produk
+                ?? optional($produksi->pesanan)->produk
+                ?? '-';
+
+            $jumlah = $produksi->jumlah
+                ?? optional($produksi->pesanan)->jumlah
+                ?? optional($produksi->pesanan)->jumlah_total
+                ?? '-';
+
+            $progressText = $r->filled('progress')
+                ? $r->progress . '%'
+                : ($produksi->progress ? $produksi->progress . '%' : null);
+
+            $statusLabel = $status->label ?? Str::title(str_replace('-', ' ', $status->key));
+
+
+            $trackingUrl = url('/tracking?nomor=' . urlencode($nomorProduksi));
+
+            $catatan = $r->catatan ?: null;
+
+            $pesanWa  = "Halo {$namaPelanggan} 👋\n\n";
+            $pesanWa .= "Update terbaru untuk pesanan kamu:\n";
+            $pesanWa .= "Nomor Produksi : {$nomorProduksi}\n";
+            $pesanWa .= "Status         : {$statusLabel}\n";
+            if ($progressText) {
+                $pesanWa .= "Progress       : {$progressText}\n";
+            }
+            $pesanWa .= "Produk         : {$produkNama}\n";
+            $pesanWa .= "Jumlah         : {$jumlah} pcs\n";
+
+            if ($catatan) {
+                $pesanWa .= "\nCatatan dari tim:\n{$catatan}\n";
+            }
+
+            $pesanWa .= "\nPantau perkembangan produksi kamu di sini:\n{$trackingUrl}\n\n";
+            $pesanWa .= "Terima kasih 🙏";
+
+
+            if ($targetPhone) {
+                try {
+                    $ok = FonnteService::sendMessage($targetPhone, $pesanWa);
+
+                    if (!$ok) {
+                        Log::warning('Fonnte gagal kirim notifikasi update produksi', [
+                            'produksi_id' => $produksi->id,
+                            'phone'       => $targetPhone,
+                            'status_key'  => $status->key,
+                        ]);
+                    }
+                } catch (\Throwable $e) {
+                    Log::error('Gagal kirim WA update produksi', [
+                        'error'        => $e->getMessage(),
+                        'produksi_id'  => $produksi->id,
+                        'phone'        => $targetPhone,
+                        'status_key'   => $status->key,
+                    ]);
+                }
+            } else {
+                Log::warning('Nomor HP pelanggan kosong/tidak valid, WA tidak dikirim', [
+                    'produksi_id' => $produksi->id,
+                    'pelanggan_id'=> $pelanggan->id ?? null,
+                ]);
+            }
+        }
+    }
+
 
     return back()->with('berhasil','Status produksi diperbarui.');
 }

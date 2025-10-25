@@ -118,7 +118,7 @@ class PesananAdminController extends Controller
         return redirect()->route('admin.pesanan.show', $pesanan)->with('berhasil','Pesanan diperbarui.');
     }
 
-    // (Opsional) Hapus
+
     public function destroy(Pesanan $pesanan)
     {
         $pesanan->delete();
@@ -134,12 +134,10 @@ class PesananAdminController extends Controller
         ]);
     }
 
-    // 1. Pastikan nomor resi ada
     if (blank($pesanan->nomor_resi)) {
         $pesanan->nomor_resi = $this->buatNomorResi(); // sesuai fungsi kamu
     }
 
-    // 2. Update status pesanan
     $pesanan->update([
         'status'            => 'disetujui',
         'disetujui_oleh'    => Auth::id(),
@@ -147,7 +145,6 @@ class PesananAdminController extends Controller
         'nomor_resi'        => $pesanan->nomor_resi,
     ]);
 
-    // 3. Buat produksi (kalau logic kamu memang bikin Produksi setelah disetujui)
     $produksi = Produksi::firstOrCreate(
         ['pesanan_id' => $pesanan->id],
         [
@@ -157,7 +154,6 @@ class PesananAdminController extends Controller
         ]
     );
 
-    // catat log awal produksi, kalau kamu memang logging seperti ini
     $produksi->logs()->create([
         'status_key'   => ProduksiStatus::orderBy('urutan')->value('key') ?? 'desain',
         'catatan'      => 'Produksi dibuat dari persetujuan pesanan',
@@ -230,19 +226,77 @@ class PesananAdminController extends Controller
 
 
     public function tolak(Request $request, Pesanan $pesanan)
-    {
-        $request->validate(['alasan' => ['required','string','max:2000']]);
+{
 
-        if ($pesanan->status !== 'menunggu') return back()->with('peringatan','Pesanan sudah diproses.');
-
-        $pesanan->update([
-            'status' => 'ditolak',
-            'disetujui_oleh' => Auth::id(), 
-            'alasan_ditolak' => $request->alasan,
-        ]);
-
-        return back()->with('berhasil','Pesanan ditolak.');
+    if ($pesanan->status !== 'menunggu') {
+        return back()->with('peringatan', 'Pesanan sudah diproses sebelumnya.');
     }
+
+
+    $validated = $request->validate([
+        'alasan_ditolak' => ['required', 'string', 'max:500'],
+    ]);
+
+
+    $pesanan->update([
+        'status'          => 'ditolak',
+        'alasan_ditolak'  => $validated['alasan_ditolak'],
+
+    ]);
+
+    $pelanggan = $pesanan->pengguna ?? null;
+    if ($pelanggan) {
+        $rawPhone = $pelanggan->no_hp ?? null;
+        $targetPhone = null;
+
+        if ($rawPhone) {
+            $clean = preg_replace('/[^0-9]/', '', $rawPhone);
+            if (Str::startsWith($clean, '0')) {
+                $targetPhone = '62' . substr($clean, 1);
+            } elseif (Str::startsWith($clean, '62')) {
+                $targetPhone = $clean;
+            } else {
+                $targetPhone = $clean;
+            }
+        }
+
+        $nama   = $pelanggan->name ?? '-';
+        $produk = $pesanan->produk ?? '-';
+        $jumlah = $pesanan->jumlah_total ?? ($pesanan->jumlah ?? '-');
+        $alasan = $validated['alasan_ditolak'];
+
+        $pesan = "Halo {$nama}, maaf pesanan kamu TIDAK BISA DIPROSES ❌\n\n";
+        $pesan .= "Produk  : {$produk}\n";
+        $pesan .= "Jumlah  : {$jumlah} pcs\n\n";
+        $pesan .= "Alasan penolakan:\n{$alasan}\n\n";
+        $pesan .= "Silakan revisi pesanan atau hubungi kami untuk bantuan.\n\n";
+        $pesan .= "Terima kasih 🙏";
+
+        if ($targetPhone) {
+            try {
+                $ok = FonnteService::sendMessage($targetPhone, $pesan);
+                if (!$ok) {
+                    Log::warning('Fonnte gagal kirim notifikasi penolakan', [
+                        'pesanan_id' => $pesanan->id,
+                        'phone'      => $targetPhone,
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Gagal kirim WA penolakan', [
+                    'error'      => $e->getMessage(),
+                    'pesanan_id' => $pesanan->id,
+                ]);
+            }
+        } else {
+            Log::warning('Tidak ada no_hp pelanggan untuk penolakan', [
+                'pesanan_id' => $pesanan->id,
+                'user_id'    => $pelanggan->id ?? null,
+            ]);
+        }
+    }
+
+    return back()->with('berhasil', 'Pesanan ditolak & pelanggan sudah diberi info.');
+}
 
     protected function buatNomorResi(): string
     {
