@@ -263,7 +263,7 @@ class PesananAdminController extends Controller
                 $pesanWa =
                     "Halo {$pesanan->pengguna->name}, maaf pesanan kamu *DITOLAK* ❌\n\n".
                     "Produk: {$pesanan->produk}\n".
-                    "Jumlah: {$pesanan->jumlah_total} pcs\n".
+                    "Jumlah: {$pesanan->jumlah} pcs\n".
                     "Alasan penolakan:\n".
                     "{$validated['alasan']}\n\n".
                     "Silakan hubungi kami untuk perbaikan pesanan 🙏";
