@@ -93,36 +93,62 @@ class PesananController extends Controller
 
         $isOwner = $pesanan->pengguna_id == $user->id;
 
-        if ($user->role === 'customer' && !$isOwner) {
+        if ($user->role === 'customer' && ! $isOwner) {
             abort(404);
         }
 
         if (!$pesanan->nomor_resi) {
-            return redirect()->route('pesanan.tampil', $pesanan)->with('gagal', 'Nomor resi belum tersedia.');
+            return redirect()
+                ->route('pesanan.tampil', $pesanan)
+                ->with('gagal', 'Nomor resi belum tersedia.');
         }
 
         $produksi = Produksi::with([
             'logs' => function ($query) {
-                $query->latest();
+                $query->orderByDesc('created_at')
+                    ->orderByDesc('id');
             },
-            'pesanan.pengguna',
+            'pesanan.pengguna:id,name,email',
         ])
             ->where('nomor_resi', $pesanan->nomor_resi)
+            ->orWhereHas('pesanan', function ($q) use ($pesanan) {
+                $q->where('nomor_resi', $pesanan->nomor_resi);
+            })
             ->first();
 
         if (!$produksi) {
-            return redirect()->route('pesanan.tampil', $pesanan)->with('gagal', 'Data produksi belum tersedia.');
+            return redirect()
+                ->route('pesanan.tampil', $pesanan)
+                ->with('gagal', 'Data produksi belum tersedia.');
         }
 
-        $statusNow = optional($produksi->logs->first())->tahapan ?? 'Antri';
+        $latest = $produksi->logs->first();
 
-        $steps = ['Antri', 'Desain', 'Cetak', 'Finishing', 'Packaging', 'Selesai'];
+        $rawStatus = $latest?->tahapan
+            ?? $latest?->status_key
+            ?? $latest?->status
+            ?? $latest?->label;
+
+        $statusNow = $rawStatus
+            ?: $produksi->status_sekarang
+            ?: $produksi->status
+            ?: 'Antri';
+
+        $steps = [
+            'Antri',
+            'Desain',
+            'Cutting',
+            'Sablon',
+            'Finishing',
+            'Packaging',
+            'Selesai',
+        ];
 
         return view('public.home', [
-            'nomor' => $pesanan->nomor_resi,
-            'produksi' => $produksi,
+            'nomor'     => $pesanan->nomor_resi,
+            'produksi'  => $produksi,
             'statusNow' => $statusNow,
-            'steps' => $steps,
+            'steps'     => $steps,
         ]);
     }
 }

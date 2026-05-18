@@ -60,6 +60,7 @@
             $badge = [
                 'Antri' => 'bg-slate-100 text-slate-700 ring-1 ring-slate-200',
                 'Desain' => 'bg-sky-100 text-sky-700 ring-1 ring-sky-200',
+                'Sablon' => 'bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200',
                 'Cetak' => 'bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200',
                 'Finishing' => 'bg-amber-100 text-amber-800 ring-1 ring-amber-200',
                 'Packaging' => 'bg-teal-100 text-teal-700 ring-1 ring-teal-200',
@@ -69,6 +70,7 @@
             $dot = [
                 'Antri' => 'bg-slate-400',
                 'Desain' => 'bg-sky-500',
+                'Sablon' => 'bg-indigo-500',
                 'Cetak' => 'bg-indigo-500',
                 'Finishing' => 'bg-amber-500',
                 'Packaging' => 'bg-teal-500',
@@ -111,13 +113,21 @@
                         </div>
 
 
+                        @php
+                            $statusTitle = \Illuminate\Support\Str::title($statusNow ?? 'Antri');
+
+                            $statusBadge = $badge[$statusTitle] ?? 'bg-slate-100 text-slate-700 ring-1 ring-slate-200';
+
+                            $statusDot = $dot[$statusTitle] ?? 'bg-slate-400';
+                        @endphp
+
                         <div class="sm:text-right sm:justify-self-end">
                             <div class="text-xs uppercase tracking-wide text-slate-500">Status Sekarang</div>
                             <div class="mt-1 inline-flex items-center gap-2">
-                                <span
-                                    class="h-2 w-2 rounded-full {{ ($statusNow ?? '') === 'Selesai' ? 'bg-emerald-600' : 'bg-indigo-500' }}"></span>
+                                <span class="h-2 w-2 rounded-full {{ $statusDot }}"></span>
+
                                 <span class="rounded-full px-2.5 py-1 text-xs font-medium {{ $statusBadge }}">
-                                    {{ \Illuminate\Support\Str::title($statusNow ?? '-') }}
+                                    {{ $statusTitle }}
                                 </span>
                             </div>
                         </div>
