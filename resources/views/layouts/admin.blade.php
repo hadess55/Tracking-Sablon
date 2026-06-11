@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ $title ?? 'Panel Admin' }}</title>
 
+  <link rel="icon" type="image/png" href="{{ asset('Favicon/favicon-96x96.png') }}" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="{{ asset('Favicon/favicon.svg') }}" />
+  <link rel="shortcut icon" href="{{ asset('Favicon/favicon.ico') }}" />
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('Favicon/apple-touch-icon.png') }}" />
+  <link rel="manifest" href="{{ asset('Favicon/site.webmanifest') }}" />
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script>

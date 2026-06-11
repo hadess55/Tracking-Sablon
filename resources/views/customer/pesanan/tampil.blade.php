@@ -18,7 +18,7 @@
         };
 
         // ukuran = array: s,m,l,xl,xxl
-        $uk = collect($pesanan->ukuran ?? [])
+        $uk = collect($pesanan->ukuran_kaos ?? [])
             ->map(fn($v) => (int) $v)
             ->filter();
         $total = (int) $pesanan->jumlah;
@@ -116,21 +116,6 @@
                                 </span>
                             @endforeach
                         </div>
-                    </div>
-                @endif
-
-                {{-- Link drive --}}
-                @if ($pesanan->drive_link)
-                    <div class="mt-4">
-                        <div class="text-xs text-slate-500 mb-1">Link Drive</div>
-                        <a href="{{ $pesanan->drive_link }}" target="_blank" rel="noopener"
-                            class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-width="2"
-                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
-                            Buka tautan
-                        </a>
                     </div>
                 @endif
 

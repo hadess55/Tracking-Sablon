@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>{{ $title ?? 'Masuk' }} — Tracking Produksi</title>
 
+  <link rel="icon" type="image/png" href="{{ asset('Favicon/fa    vicon-96x96.png') }}" sizes="96x96" />
+        <link rel="icon" type="image/svg+xml" href="{{ asset('Favicon/favicon.svg') }}" />
+        <link rel="shortcut icon" href="{{ asset('Favicon/favicon.ico') }}" />
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('Favicon/apple-touch-icon.png') }}" />
+        <link rel="manifest" href="{{ asset('Favicon/site.webmanifest') }}" />
+
   {{-- Tailwind CDN --}}
   <script src="https://cdn.tailwindcss.com"></script>
   {{-- Alpine --}}
@@ -44,11 +50,9 @@
   <div class="min-h-full flex items-center justify-center px-4 py-10">
     <div class="w-full max-w-md">
       <div class="mb-6 text-center">
-        <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-100 text-brand-600 shadow-soft">
+        <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/70 text-brand-600 shadow-soft">
           {{-- Logo --}}
-          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-width="2" d="M3 6h18M3 12h18M3 18h18"/>
-          </svg>
+          <img src="{{ asset('Favicon/favicon-96x96.png') }}" alt="Logo" >
         </div>
         <h1 class="text-xl font-semibold">{{ $title ?? 'Masuk' }}</h1>
         @isset($subtitle)
@@ -64,7 +68,7 @@
       </div>
 
       <p class="mt-6 text-center text-xs text-slate-500">
-        © {{ date('Y') }} Tracking Produksi Sablon • by OlympusProject
+        © {{ date('Y') }} Tracking Produksi Sablon 
       </p>
     </div>
   </div>

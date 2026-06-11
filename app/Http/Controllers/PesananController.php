@@ -55,7 +55,7 @@ class PesananController extends Controller
 
         if ($jumlah <= 0) {
             return back()
-                ->withErrors(['jumlah_manual' => 'Jumlah harus diisi (melalui per-size atau jumlah manual).'])
+                ->withErrors(['ukuran' => 'Total pesanan harus lebih dari 0. Silakan isi jumlah ukuran.'])
                 ->withInput();
         }
 
@@ -64,12 +64,17 @@ class PesananController extends Controller
             'produk' => $data['produk'],
             'bahan' => $data['bahan'],
             'warna' => $data['warna'],
-            'drive_link' => $data['drive_link'] ?? null,
+            'tautan_drive' => $data['drive_link'] ?? null,
             'deskripsi' => $data['deskripsi'] ?? null,
-            'ukuran' => $uk,
+            'ukuran_kaos' => [
+                'S' => $uk['s'] ?? 0,
+                'M' => $uk['m'] ?? 0,
+                'L' => $uk['l'] ?? 0,
+                'XL' => $uk['xl'] ?? 0,
+                'XXL' => $uk['xxl'] ?? 0,
+            ],
             'jumlah' => $jumlah,
             'status' => 'menunggu',
-            // 'nomor_resi' => null,
         ]);
 
         return redirect()->route('pesanan.tampil', $pesanan)->with('berhasil', 'Pesanan terkirim. Menunggu persetujuan admin.');

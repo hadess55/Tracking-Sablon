@@ -18,13 +18,10 @@
       {{-- LEFT: Logo unik --}}
       <a href="{{ url('/') }}" class="flex items-center gap-2">
         {{-- Ikon kaos (SVG custom) --}}
-        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-          <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"
-              d="M6 4l3-2h6l3 2 3 2-3 4v8a2 2 0 01-2 2h-8a2 2 0 01-2-2V10L3 6l3-2z"/>
-          </svg>
+        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/70 text-indigo-600">
+          <img src="{{ asset('Favicon/favicon-96x96.png') }}" alt="Logo">
         </span>
-        <span class="font-semibold tracking-tight text-slate-800">Tracking Produksi</span>
+        <span class="font-semibold tracking-tight text-slate-800">Afterprint</span>
       </a>
 
       {{-- Spacer untuk dorong menu ke kanan --}}

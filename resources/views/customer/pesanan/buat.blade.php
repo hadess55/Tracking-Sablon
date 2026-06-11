@@ -37,8 +37,17 @@
       {{-- Produk & Bahan --}}
       <div class="grid gap-4 sm:grid-cols-2">
         <div>
-          <label class="text-sm text-slate-600">Produk <span class="text-rose-500">*</span></label>
-          <input type="text" name="produk" required
+          <div class="flex items-center justify-between">
+            <label class="text-sm text-slate-600">Produk <span class="text-rose-500">*</span></label>
+            <div class="flex gap-1">
+              @foreach (['Kaos','Hoodie','Jersey','Bendera'] as $opt)
+              <button type="button"
+                      @click="$refs.produk.value='{{ $opt }}'"
+                      class="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[11px] text-slate-600 hover:bg-slate-50">{{ $opt }}</button>
+              @endforeach
+            </div>
+          </div>
+          <input type="text" name="produk" required x-ref="produk"
                  value="{{ old('produk') }}"
                  class="mt-1 w-full rounded-xl border border-slate-200 bg-white/80 px-3 py-2 focus:border-indigo-500 focus:outline focus:outline-2 focus:outline-indigo-500"
                  placeholder="">
@@ -49,7 +58,7 @@
           <div class="flex items-center justify-between">
             <label class="text-sm text-slate-600">Bahan <span class="text-rose-500">*</span></label>
             <div class="flex gap-1">
-              @foreach (['Cotton 24s','Cotton 30s','Fleece','Pique'] as $opt)
+              @foreach (['Cotton 20s','Cotton 24s','Cotton 30s'] as $opt)
               <button type="button"
                       @click="$refs.bahan.value='{{ $opt }}'"
                       class="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[11px] text-slate-600 hover:bg-slate-50">{{ $opt }}</button>
@@ -79,7 +88,7 @@
           <div class="flex items-center justify-between">
             <label class="text-sm text-slate-600">Warna <span class="text-rose-500">*</span></label>
             <div class="flex gap-1">
-              @foreach (['Putih','Hitam'] as $opt)
+              @foreach (['Putih','Hitam','Maroon','Biru','Navy','Merah'] as $opt)
               <button type="button"
                       @click="$refs.warna.value='{{ $opt }}'"
                       class="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[11px] text-slate-600 hover:bg-slate-50">{{ $opt }}</button>
@@ -98,7 +107,6 @@
       <div>
         <div class="mb-1 flex items-end justify-between">
           <label class="text-sm text-slate-600">Ukuran Kaos (jumlah per ukuran)</label>
-          <span class="text-[11px] text-slate-500">Jika semua 0, total akan memakai <b>Jumlah Manual</b>.</span>
         </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
@@ -118,23 +126,12 @@
         </div>
       </div>
 
-      {{-- Jumlah manual & Total --}}
-      <div class="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label class="text-sm text-slate-600">Jumlah Manual (opsional)</label>
-          <input type="number" min="0" name="jumlah_manual" x-model.number="jumlahManual"
-                 value="{{ old('jumlah_manual') }}"
-                 class="mt-1 w-full rounded-xl border border-slate-200 bg-white/80 px-3 py-2 focus:border-indigo-500 focus:outline focus:outline-2 focus:outline-indigo-500"
-                 placeholder="Isi jika tidak menggunakan per-size">
-          @error('jumlah_manual') <div class="mt-1 text-xs text-rose-600">{{ $message }}</div> @enderror
-        </div>
-
-        <div>
-          <label class="text-sm text-slate-600">Total (otomatis)</label>
-          <div class="mt-1 flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
-            <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="2" d="M3 10h18M7 6h10M7 14h10M3 18h18"/></svg>
-            <input type="number" readonly :value="total" class="w-full bg-transparent text-slate-700">
-          </div>
+      {{-- Total --}}
+      <div>
+        <label class="text-sm text-slate-600">Total (otomatis)</label>
+        <div class="mt-1 flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+          <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="2" d="M3 10h18M7 6h10M7 14h10M3 18h18"/></svg>
+          <input type="number" readonly :value="total" class="w-full bg-transparent text-slate-700">
         </div>
       </div>
 
@@ -166,10 +163,8 @@
 function formPesanan(){
   return {
     uk: {s:0, m:0, l:0, xl:0, xxl:0},
-    jumlahManual: Number('{{ old('jumlah_manual', 0) }}') || 0,
     get total(){
-      const t = (this.uk.s||0)+(this.uk.m||0)+(this.uk.l||0)+(this.uk.xl||0)+(this.uk.xxl||0);
-      return t > 0 ? t : (this.jumlahManual||0);
+      return (this.uk.s||0)+(this.uk.m||0)+(this.uk.l||0)+(this.uk.xl||0)+(this.uk.xxl||0);
     },
     inc(k){ this.uk[k] = Number(this.uk[k]||0) + 1; },
     dec(k){ this.uk[k] = Math.max(0, Number(this.uk[k]||0) - 1); },

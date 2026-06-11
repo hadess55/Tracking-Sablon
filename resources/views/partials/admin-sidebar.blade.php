@@ -1,9 +1,10 @@
 <div class="h-full bg-white/60 backdrop-blur-xl border-r border-white/40 shadow-glass flex flex-col">
   <div class="h-16 px-2 lg:px-3 flex items-center gap-2 lg:gap-3 border-b border-white/50">
-    <span class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-brand-600 text-white shadow-soft">TP</span>
+    {{-- <span class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-brand-600 text-white shadow-soft">TP</span> --}}
+    <img src="{{ asset('Favicon/favicon-96x96.png') }}" alt="Afterprint Logo" class="w-10 h-10 rounded-lg bg-white/70 p-1 shadow-soft">
 
     <div class="overflow-hidden" x-show="openSidebar" x-transition>
-      <div class="font-semibold leading-5 truncate">Tracking Produksi</div>
+      <div class="font-semibold leading-5 truncate">Afterprint</div>
       <div class="text-[11px] text-slate-500 truncate">Admin</div>
     </div>
 

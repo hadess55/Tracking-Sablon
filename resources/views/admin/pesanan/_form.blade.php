@@ -109,15 +109,7 @@
         </div>
       </div>
 
-      <p class="mt-2 text-xs text-gray-500">Jika semua 0, total akan memakai nilai <b>Jumlah manual</b> di bawah.</p>
 
-      <div class="mt-3">
-        <label class="mb-1 block text-xs font-medium text-gray-600">Jumlah manual (opsional)</label>
-        <input id="jumlah-manual" type="number" min="1" name="jumlah"
-               value="{{ old('jumlah', $pesanan->jumlah ?? null) }}"
-               class="w-40 rounded-xl border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-        <p id="jumlah-hint" class="mt-1 text-xs text-gray-500">Aktif bila semua ukuran = 0.</p>
-      </div>
     </div>
   </div>
 
@@ -147,11 +139,9 @@
     syncCounter();
   }
 
-  // ===== Hitung total ukuran & toggle jumlah manual =====
+  // ===== Hitung total ukuran =====
   const sizeInputs = document.querySelectorAll('.ukuran-input');
   const badge = document.getElementById('total-badge');
-  const manual = document.getElementById('jumlah-manual');
-  const hint = document.getElementById('jumlah-hint');
 
   function calc(){
     let total = 0;
@@ -163,18 +153,6 @@
     if (badge){
       badge.classList.toggle('hidden', total === 0);
       badge.textContent = `Total: ${total}`;
-    }
-
-    if (manual){
-      if (total > 0){
-        manual.setAttribute('disabled','disabled');
-        manual.classList.add('bg-gray-100');
-        hint.textContent = 'Jumlah dihitung otomatis dari total ukuran.';
-      } else {
-        manual.removeAttribute('disabled');
-        manual.classList.remove('bg-gray-100');
-        hint.textContent = 'Aktif bila semua ukuran = 0.';
-      }
     }
   }
 

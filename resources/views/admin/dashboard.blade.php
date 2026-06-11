@@ -124,7 +124,7 @@
     </div>
 
     {{-- Ringkas Total --}}
-    <div class="grid gap-4 sm:grid-cols-3">
+    {{-- <div class="grid gap-4 sm:grid-cols-3">
       <div class="rounded-2xl border border-white/60 bg-white/80 backdrop-blur p-4 shadow-sm">
         <div class="text-sm text-slate-500">Total Pesanan</div>
         <div class="mt-1 text-xl font-semibold">{{ $totalPesanan ?? 0 }}</div>
@@ -137,7 +137,7 @@
         <div class="text-sm text-slate-500">Total Customer</div>
         <div class="mt-1 text-xl font-semibold">{{ $totalCustomer ?? 0 }}</div>
       </div>
-    </div>
+    </div> --}}
 
   </div>
 
