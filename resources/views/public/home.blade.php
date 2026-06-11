@@ -68,7 +68,7 @@
             ];
 
             $dot = [
-                'Antri' => 'bg-slate-400',
+                'Antri' => 'bg-slate-400', 
                 'Desain' => 'bg-sky-500',
                 'Sablon' => 'bg-indigo-500',
                 'Cetak' => 'bg-indigo-500',
@@ -233,8 +233,8 @@
                 <p class="mt-1 text-sm text-slate-600">Status diperbarui setiap ada perubahan tahapan produksi.</p>
             </div>
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h4 class="font-semibold text-slate-900">Notifikasi WhatsApp</h4>
-                <p class="mt-1 text-sm text-slate-600">Opsional otomatis kirim pesan saat progres penting.</p>
+                <h4 class="font-semibold text-slate-900">Kapanpun Dimanapun</h4>
+                <p class="mt-1 text-sm text-slate-600">Lacak pesanan Anda kapan saja dan di mana saja.</p>
             </div>
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <h4 class="font-semibold text-slate-900">Arsip & Riwayat</h4>
@@ -301,7 +301,7 @@
             </div>
 
 
-            <div class="rounded-xl border border-slate-200 bg-white/80 shadow-sm">
+            {{-- <div class="rounded-xl border border-slate-200 bg-white/80 shadow-sm">
                 <button type="button" class="w-full flex items-center justify-between px-5 py-4"
                     @click="open === 4 ? open = null : open = 4">
                     <span class="text-left font-medium text-slate-900">
@@ -315,7 +315,7 @@
                 <div x-show="open === 4" x-transition class="px-5 pb-5 text-slate-600">
                     Ya, admin dapat mengaktifkan notifikasi otomatis untuk setiap perubahan status pesanan Anda.
                 </div>
-            </div>
+            </div> --}}
 
         </div>
     </section>
